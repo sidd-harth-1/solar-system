@@ -125,7 +125,10 @@ jobs:
           run: |
             docker images
             docker run --name solar-system-app -d  -p 80:80   nginx:1.25.2-alpine-slim
-
-            docker run  alpine wget -q -O - http://solar-system-app:80
+            export IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' solar-system-app)
+            echo $IP
+            echo Testing Image URL using alpine 
+            docker run  alpine wget -q -O - http://$IP:80
+            	
             # echo Testing using curl
             # curl  http://localhost:80
