@@ -122,4 +122,5 @@ jobs:
             echo $IP
             
             echo Testing Image URL using alpine 
-            docker run  alpine wget -q -O - $IP:3000/live | grep live	
+            wget 127.0.0.1:3000/live | grep live	
+            # docker run  alpine wget -q -O - $IP:3000/live | grep live	
