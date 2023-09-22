@@ -126,6 +126,6 @@ jobs:
             docker images
             docker run --name solar-system-app -d  -p 80:80   nginx:1.25.2-alpine-slim
 
-            
-            echo Testing using curl
-            curl  http://localhost:80
+            docker run  alpine wget -q -O - http://solar-system-app:80
+            # echo Testing using curl
+            # curl  http://localhost:80
