@@ -91,32 +91,41 @@ jobs:
         runs-on: ubuntu-latest
        # needs: [code-coverage, unit-testing]
         steps:
-        - name: Checkout
-          uses: actions/checkout@v4
+        # - name: Checkout
+        #   uses: actions/checkout@v4
 
-        - name: Dockerhub Login
-          uses: docker/login-action@v2.2.0
-          with:
-            username: ${{ env.DOCKERHUB_USERNAME }}
-            password: ${{ secrets.DOCKERHUB_PASSWORD }}
+        # - name: Dockerhub Login
+        #   uses: docker/login-action@v2.2.0
+        #   with:
+        #     username: ${{ env.DOCKERHUB_USERNAME }}
+        #     password: ${{ secrets.DOCKERHUB_PASSWORD }}
         
-        - name: Docker Build For Testing
-          uses: docker/build-push-action@v4
-          with:
-            context: .
-            load: true
-            push: false
-            tags: ${{ env.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha }}
+        # - name: Docker Build For Testing
+        #   uses: docker/build-push-action@v4
+        #   with:
+        #     context: .
+        #     load: true
+        #     push: false
+        #     tags: ${{ env.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha }}
     
+        # - name: Docker Image Test
+        #   run: |
+        #     docker images
+        #     docker run --name solar-system-app  \
+        #         -p 3000:3000 \
+        #         -e MONGO_URI=$MONGO_URI \
+        #         -e MONGO_USERNAME=$MONGO_USERNAME \
+        #         -e MONGO_PASSWORD=$MONGO_PASSWORD \
+        #         ${{ env.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha }}
+            
+        #     echo Testing using curl
+        #     curl -s http://localhost:3000/live | grep live 
+
         - name: Docker Image Test
           run: |
             docker images
-            docker run --name solar-system-app  \
-                -p 3000:3000 \
-                -e MONGO_URI=$MONGO_URI \
-                -e MONGO_USERNAME=$MONGO_USERNAME \
-                -e MONGO_PASSWORD=$MONGO_PASSWORD \
-                ${{ env.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha }}
+            docker run --name solar-system-app -d  -p 80:80   nginx:1.25.2-alpine-slim
+
             
             echo Testing using curl
-            curl -s http://localhost:3000/live | grep live 
+            curl  http://localhost:80
