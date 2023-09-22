@@ -122,4 +122,4 @@ jobs:
             echo $IP
             
             echo Testing Image URL using wget 
-            curl 127.0.0.1:3000/live | grep live	
+            wget -q -O - 127.0.0.1:3000/live | grep live	
