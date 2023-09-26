@@ -14,96 +14,96 @@ env:
     DOCKERHUB_USERNAME: siddharth67
     
 jobs:
-    unit-testing:
-        name: Unit Testing
-        runs-on: ${{ matrix.operating_system }}
-        env:
-            MONGO_URI: 'mongodb://localhost:27017/superData'
-            MONGO_USERNAME: non-prod-user
-            MONGO_PASSWORD: non-prod-password
-        services:
-            mongo-db:
-              image: siddharth67/mongo-db:non-prod
-              ports:
-                - 27017:27017
-        strategy:
-            matrix:
-                nodejs_version: [18, 19, 20]
-                operating_system: [ubuntu-latest]
-                # exclude:
-                #     - nodejs_version: [18, 19, 20]
-                #       operating_system: [macos-latest]
-        steps:
-        - name: Checkout Repository
-          uses: actions/checkout@v4
+    # unit-testing:
+    #     name: Unit Testing
+    #     runs-on: ${{ matrix.operating_system }}
+    #     env:
+    #         MONGO_URI: 'mongodb://localhost:27017/superData'
+    #         MONGO_USERNAME: non-prod-user
+    #         MONGO_PASSWORD: non-prod-password
+    #     services:
+    #         mongo-db:
+    #           image: siddharth67/mongo-db:non-prod
+    #           ports:
+    #             - 27017:27017
+    #     strategy:
+    #         matrix:
+    #             nodejs_version: [18, 19, 20]
+    #             operating_system: [ubuntu-latest]
+    #             # exclude:
+    #             #     - nodejs_version: [18, 19, 20]
+    #             #       operating_system: [macos-latest]
+    #     steps:
+    #     - name: Checkout Repository
+    #       uses: actions/checkout@v4
 
-        - name: Setup NodeJS Version - ${{ matrix.nodejs_version }} on ${{ matrix.operating_system }}
-          uses: actions/setup-node@v3
-          with:
-            node-version: ${{ matrix.nodejs_version }}
+    #     - name: Setup NodeJS Version - ${{ matrix.nodejs_version }} on ${{ matrix.operating_system }}
+    #       uses: actions/setup-node@v3
+    #       with:
+    #         node-version: ${{ matrix.nodejs_version }}
 
-        - name: Cache NPM dependencies
-          uses: actions/cache@v3
-          with:
-            path: ~/.npm
-            key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}     
+    #     - name: Cache NPM dependencies
+    #       uses: actions/cache@v3
+    #       with:
+    #         path: ~/.npm
+    #         key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}     
 
-        - name: Install Dependencies
-          run: npm install
+    #     - name: Install Dependencies
+    #       run: npm install
     
-        - name: Unit Testing
-          id: node-unit-testing-step
-          run: npm test
+    #     - name: Unit Testing
+    #       id: node-unit-testing-step
+    #       run: npm test
           
-        - name: Archive Test Result
-          if: always() && (steps.node-unit-testing-step.outcome == 'failure' || steps.node-unit-testing-step.outcome == 'success')
-          uses: actions/upload-artifact@v3
-          with:
-            name: Mocha-Test-Result
-            path: test-results.xml
+    #     - name: Archive Test Result
+    #       if: always() && (steps.node-unit-testing-step.outcome == 'failure' || steps.node-unit-testing-step.outcome == 'success')
+    #       uses: actions/upload-artifact@v3
+    #       with:
+    #         name: Mocha-Test-Result
+    #         path: test-results.xml
 
-    code-coverage:
-        name: Code Coverage
-        env:
-            MONGO_URI: 'mongodb://mongo:27017/superData'
-            MONGO_USERNAME: non-prod-user
-            MONGO_PASSWORD: non-prod-password
-        container: 
-           image: node:18
-        services:
-            mongo-db:
-                image: siddharth67/mongo-db:non-prod
-                options: 
-                    --name mongo
-        runs-on: ubuntu-latest
-        steps:
-        - name: Checkout Repository
-          uses: actions/checkout@v4
+    # code-coverage:
+    #     name: Code Coverage
+    #     env:
+    #         MONGO_URI: 'mongodb://mongo:27017/superData'
+    #         MONGO_USERNAME: non-prod-user
+    #         MONGO_PASSWORD: non-prod-password
+    #     container: 
+    #        image: node:18
+    #     services:
+    #         mongo-db:
+    #             image: siddharth67/mongo-db:non-prod
+    #             options: 
+    #                 --name mongo
+    #     runs-on: ubuntu-latest
+    #     steps:
+    #     - name: Checkout Repository
+    #       uses: actions/checkout@v4
 
-        # - name: Setup NodeJS Version - 18
-        #   uses: actions/setup-node@v3
-        #   with:
-        #     node-version: 18
+    #     # - name: Setup NodeJS Version - 18
+    #     #   uses: actions/setup-node@v3
+    #     #   with:
+    #     #     node-version: 18
 
-        - name: Cache NPM dependencies
-          uses: actions/cache@v3
-          with:
-            path: ~/.npm
-            key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}     
+    #     - name: Cache NPM dependencies
+    #       uses: actions/cache@v3
+    #       with:
+    #         path: ~/.npm
+    #         key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}     
                 
-        - name: Install Dependencies
-          run: npm install
+    #     - name: Install Dependencies
+    #       run: npm install
     
-        - name: Check Code Coverage
-          continue-on-error: true
-          run: npm run coverage
+    #     - name: Check Code Coverage
+    #       continue-on-error: true
+    #       run: npm run coverage
           
-        - name: Archive Test Result
-          uses: actions/upload-artifact@v3
-          with:
-            name: Code-Coverage-Result
-            path: coverage
-            retention-days: 5
+    #     - name: Archive Test Result
+    #       uses: actions/upload-artifact@v3
+    #       with:
+    #         name: Code-Coverage-Result
+    #         path: coverage
+    #         retention-days: 5
 
 
     # docker:
@@ -161,3 +161,17 @@ jobs:
     #         tags: |
     #              ${{ env.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha }}
     #              ghcr.io/${{ github.repository_owner }}/solar-system:${{ github.sha }}
+    deploy:
+      # needs: docker
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v4
+  
+        - name: Install Kubectl
+          uses: azure/setup-kubectl@v3
+          with:
+            version: 'v1.26.0' # default is latest stable  
+  
+        - name: Fetch Kubernetes Cluster Nodes Details
+          run: kubectl get nodes
