@@ -205,3 +205,14 @@ jobs:
         - name: Check files
           run: |
             cat kubernetes/development/*.yaml
+
+        - name: Create MongoDB Secret
+          run: |
+             kubectl create secret generic mongo-db-creds \
+             --from-literal=MONGO_URI=${{ secrets.MONGO_URI }} \
+             --from-literal=MONGO_USERNAME=${{ secrets.MONGO_USERNAME }} \
+             --from-literal=MONGO_PASSWORD=${{ secrets.MONGO_PASSWORD }}
+
+        - name: Deploy to Kubernetes Development Environment
+          run: |
+            kubectl apply -f kubernetes/development/
