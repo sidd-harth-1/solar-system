@@ -109,6 +109,7 @@ jobs:
       needs: [code-coverage, unit-testing]
       name: AWS S3 - Upload Reports
       runs-on: ubuntu-latest
+      continue-on-error: true
       steps:
         - name: Download Mocha Test Artifact
           uses: actions/download-artifact@v3
