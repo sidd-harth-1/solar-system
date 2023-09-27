@@ -171,9 +171,9 @@ jobs:
         k8s-kubeconfig: ${{ secrets.KUBECONFIG }}
         mongodb-password: ${{ secrets.MONGO_PASSWORD }}
       with:
-        mongodb-username: ${{ github.env.MONGO_USERNAME }}
-        mongodb-uri: ${{ github.env.MONGO_URI }}
-        docker-username: ${{ github.env.DOCKERHUB_USERNAME }}
+        mongodb-username: ${{ vars.MONGO_USERNAME }}
+        mongodb-uri: ${{ vars.MONGO_URI }}
+        docker-username: ${{ vars.DOCKERHUB_USERNAME }}
 
     dev-integration-test:
       if: contains(github.ref, 'feature/')
