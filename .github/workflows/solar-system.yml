@@ -28,7 +28,7 @@ jobs:
                 - 27017:27017
         strategy:
             matrix:
-                nodejs_version: [18, 19, 20]
+                nodejs_version: [18,  20]
                 operating_system: [ubuntu-latest]
                 # exclude:
                 #     - nodejs_version: [18, 19, 20]
