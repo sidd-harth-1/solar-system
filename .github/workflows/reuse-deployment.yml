@@ -15,7 +15,17 @@ on:
             mongodb-username:
                 description: Provide the username of MongoDB
                 required: true
-                type: string    
+                type: string   
+            kubectl-version:
+                description: Provide the required Kubectl version
+                default: v1.27.0
+                required: false
+                type: string
+            k8s-manifest-dir:
+                description: Directory containing Kubernetes manifests files
+                default: kubernetes/
+                required: true
+                type: string 
         secrets:
             k8s-kubeconfig:
                 description: Secret holding Kubeconfig file
@@ -39,7 +49,7 @@ jobs:
           - name: Install Kubectl
             uses: azure/setup-kubectl@v3
             with:
-              version: 'v1.26.0' # default is latest stable  
+              version: '${{ inputs.kubectl-version }}' # default is latest stable  
   
           - name: Set Kube Context
             uses: azure/k8s-set-context@v3
@@ -63,7 +73,7 @@ jobs:
             with:
               tokenPrefix: '_{_'
               tokenSuffix: '_}_'
-              files: '["kubernetes/development/*.yaml"]'
+              files: '["${{ inputs.k8s-manifest-dir }}*.yaml"]'
             env:
               NAMESPACE: ${{ vars.NAMESPACE }}
               REPLICAS: ${{ vars.REPLICAS }}
