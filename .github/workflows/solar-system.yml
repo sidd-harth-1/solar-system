@@ -175,6 +175,7 @@ jobs:
         mongodb-uri: ${{ vars.MONGO_URI }}
         docker-username: ${{ vars.DOCKERHUB_USERNAME }}
         k8s-manifest-dir: kubernetes/development/
+        environment: development
 
     dev-integration-test:
       if: contains(github.ref, 'feature/')
