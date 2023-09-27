@@ -165,7 +165,7 @@ jobs:
     dev-deploy:
       if: contains(github.ref, 'feature/')
       name: Deploy to Dev Environment
-      # needs: docker
+      needs: docker
       uses: ./.github/workflows/reuse-deployment.yml
       secrets:
         k8s-kubeconfig: ${{ secrets.KUBECONFIG }}
