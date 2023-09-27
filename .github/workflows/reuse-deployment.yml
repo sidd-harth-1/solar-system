@@ -1,0 +1,72 @@
+name: Deployment - Reusable Workflow
+
+on: workflow_call
+
+jobs:
+    k8s-deploy:
+        runs-on: ubuntu-latest
+        outputs:
+          APP_INGRESS_URL: ${{ steps.set-ingress-host-address.outputs.APP_INGRESS_HOST }}
+        environment:
+          name: development
+          url: https://${{ steps.set-ingress-host-address.outputs.APP_INGRESS_HOST }}
+        steps:
+          - name: Checkout Repository
+            uses: actions/checkout@v4
+    
+          - name: Install Kubectl
+            uses: azure/setup-kubectl@v3
+            with:
+              version: 'v1.26.0' # default is latest stable  
+  
+          - name: Set Kube Context
+            uses: azure/k8s-set-context@v3
+            with:
+              method: kubeconfig
+              kubeconfig: ${{ secrets.KUBECONFIG }}
+              #  context: <context name>    
+  
+          - name: Fetch Kubernetes Cluster Details
+            run: |
+              kubectl version --short -o yaml
+              echo ---------------------------------------------------
+              kubectl get nodes -o wide
+          
+          - name: Save Nginx Ingress Controller IP as a GITHUB Environment Variable
+            run: |
+              echo "INGRESS_IP=$(kubectl -n ingress-nginx get services ingress-nginx-controller -o jsonpath="{.status.loadBalancer.ingress[0].ip}")" >> $GITHUB_ENV
+  
+          - name: Replace ENV values
+            uses: cschleiden/replace-tokens@v1
+            with:
+              tokenPrefix: '_{_'
+              tokenSuffix: '_}_'
+              files: '["kubernetes/development/*.yaml"]'
+            env:
+              NAMESPACE: ${{ vars.NAMESPACE }}
+              REPLICAS: ${{ vars.REPLICAS }}
+              IMAGE: ${{ env.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha }}
+              INGRESS_IP: ${{ env.INGRESS_IP }}
+  
+          - name: Check files
+            run: |
+              cat kubernetes/development/*.yaml
+  
+          - name: Create MongoDB Secret
+            run: |
+              kubectl -n ${{ vars.NAMESPACE }} create secret generic mongo-db-creds \
+              --from-literal=MONGO_URI=${{ env.MONGO_URI }} \
+              --from-literal=MONGO_USERNAME=${{ env.MONGO_USERNAME }} \
+              --from-literal=MONGO_PASSWORD=${{ secrets.MONGO_PASSWORD }} \
+              --save-config \
+              --dry-run=client \
+              -o yaml | kubectl apply -f -
+  
+          - name: Deploy to Kubernetes Development Environment
+            run: |
+              kubectl apply -f kubernetes/development/
+          
+          - name: Set Application HOST Address in GITHUB OUTPUT
+            id: set-ingress-host-address
+            run: |
+              echo "APP_INGRESS_HOST=$(kubectl -n ${{ vars.NAMESPACE }} get ingress -o jsonpath="{.items[0].spec.tls[0].hosts[0]}")" >> "$GITHUB_OUTPUT"

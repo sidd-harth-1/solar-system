@@ -14,223 +14,161 @@ env:
     DOCKERHUB_USERNAME: siddharth67
     
 jobs:
-    unit-testing:
-        name: Unit Testing
-        runs-on: ${{ matrix.operating_system }}
-        env:
-            MONGO_URI: 'mongodb://localhost:27017/superData'
-            MONGO_USERNAME: non-prod-user
-            MONGO_PASSWORD: non-prod-password
-        services:
-            mongo-db:
-              image: siddharth67/mongo-db:non-prod
-              ports:
-                - 27017:27017
-        strategy:
-            matrix:
-                nodejs_version: [18, 19, 20]
-                operating_system: [ubuntu-latest]
-                # exclude:
-                #     - nodejs_version: [18, 19, 20]
-                #       operating_system: [macos-latest]
-        steps:
-        - name: Checkout Repository
-          uses: actions/checkout@v4
+    # unit-testing:
+    #     name: Unit Testing
+    #     runs-on: ${{ matrix.operating_system }}
+    #     env:
+    #         MONGO_URI: 'mongodb://localhost:27017/superData'
+    #         MONGO_USERNAME: non-prod-user
+    #         MONGO_PASSWORD: non-prod-password
+    #     services:
+    #         mongo-db:
+    #           image: siddharth67/mongo-db:non-prod
+    #           ports:
+    #             - 27017:27017
+    #     strategy:
+    #         matrix:
+    #             nodejs_version: [18, 19, 20]
+    #             operating_system: [ubuntu-latest]
+    #             # exclude:
+    #             #     - nodejs_version: [18, 19, 20]
+    #             #       operating_system: [macos-latest]
+    #     steps:
+    #     - name: Checkout Repository
+    #       uses: actions/checkout@v4
 
-        - name: Setup NodeJS Version - ${{ matrix.nodejs_version }} on ${{ matrix.operating_system }}
-          uses: actions/setup-node@v3
-          with:
-            node-version: ${{ matrix.nodejs_version }}
+    #     - name: Setup NodeJS Version - ${{ matrix.nodejs_version }} on ${{ matrix.operating_system }}
+    #       uses: actions/setup-node@v3
+    #       with:
+    #         node-version: ${{ matrix.nodejs_version }}
 
-        - name: Cache NPM dependencies
-          uses: actions/cache@v3
-          with:
-            path: ~/.npm
-            key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}     
+    #     - name: Cache NPM dependencies
+    #       uses: actions/cache@v3
+    #       with:
+    #         path: ~/.npm
+    #         key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}     
 
-        - name: Install Dependencies
-          run: npm install
+    #     - name: Install Dependencies
+    #       run: npm install
     
-        - name: Unit Testing
-          id: node-unit-testing-step
-          run: npm test
+    #     - name: Unit Testing
+    #       id: node-unit-testing-step
+    #       run: npm test
           
-        - name: Archive Test Result
-          if: always() && (steps.node-unit-testing-step.outcome == 'failure' || steps.node-unit-testing-step.outcome == 'success')
-          uses: actions/upload-artifact@v3
-          with:
-            name: Mocha-Test-Result
-            path: test-results.xml
+    #     - name: Archive Test Result
+    #       if: always() && (steps.node-unit-testing-step.outcome == 'failure' || steps.node-unit-testing-step.outcome == 'success')
+    #       uses: actions/upload-artifact@v3
+    #       with:
+    #         name: Mocha-Test-Result
+    #         path: test-results.xml
 
-    code-coverage:
-        name: Code Coverage
-        env:
-            MONGO_URI: 'mongodb://mongo:27017/superData'
-            MONGO_USERNAME: non-prod-user
-            MONGO_PASSWORD: non-prod-password
-        container: 
-           image: node:18
-        services:
-            mongo-db:
-                image: siddharth67/mongo-db:non-prod
-                options: 
-                    --name mongo
-        runs-on: ubuntu-latest
-        steps:
-        - name: Checkout Repository
-          uses: actions/checkout@v4
+    # code-coverage:
+    #     name: Code Coverage
+    #     env:
+    #         MONGO_URI: 'mongodb://mongo:27017/superData'
+    #         MONGO_USERNAME: non-prod-user
+    #         MONGO_PASSWORD: non-prod-password
+    #     container: 
+    #        image: node:18
+    #     services:
+    #         mongo-db:
+    #             image: siddharth67/mongo-db:non-prod
+    #             options: 
+    #                 --name mongo
+    #     runs-on: ubuntu-latest
+    #     steps:
+    #     - name: Checkout Repository
+    #       uses: actions/checkout@v4
 
-        # - name: Setup NodeJS Version - 18
-        #   uses: actions/setup-node@v3
-        #   with:
-        #     node-version: 18
+    #     # - name: Setup NodeJS Version - 18
+    #     #   uses: actions/setup-node@v3
+    #     #   with:
+    #     #     node-version: 18
 
-        - name: Cache NPM dependencies
-          uses: actions/cache@v3
-          with:
-            path: ~/.npm
-            key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}     
+    #     - name: Cache NPM dependencies
+    #       uses: actions/cache@v3
+    #       with:
+    #         path: ~/.npm
+    #         key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}     
                 
-        - name: Install Dependencies
-          run: npm install
+    #     - name: Install Dependencies
+    #       run: npm install
     
-        - name: Check Code Coverage
-          continue-on-error: true
-          run: npm run coverage
+    #     - name: Check Code Coverage
+    #       continue-on-error: true
+    #       run: npm run coverage
           
-        - name: Archive Test Result
-          uses: actions/upload-artifact@v3
-          with:
-            name: Code-Coverage-Result
-            path: coverage
-            retention-days: 5
+    #     - name: Archive Test Result
+    #       uses: actions/upload-artifact@v3
+    #       with:
+    #         name: Code-Coverage-Result
+    #         path: coverage
+    #         retention-days: 5
 
 
-    docker:
-        name: Containerization
-        permissions: 
-            packages: write
-        runs-on: ubuntu-latest
-        needs: [code-coverage, unit-testing]
-        steps:
-        - name: Checkout
-          uses: actions/checkout@v4
+    # docker:
+    #     name: Containerization
+    #     permissions: 
+    #         packages: write
+    #     runs-on: ubuntu-latest
+    #     needs: [code-coverage, unit-testing]
+    #     steps:
+    #     - name: Checkout
+    #       uses: actions/checkout@v4
 
-        - name: Dockerhub Login
-          uses: docker/login-action@v2.2.0
-          with:
-            username: ${{ env.DOCKERHUB_USERNAME }}
-            password: ${{ secrets.DOCKERHUB_PASSWORD }}
+    #     - name: Dockerhub Login
+    #       uses: docker/login-action@v2.2.0
+    #       with:
+    #         username: ${{ env.DOCKERHUB_USERNAME }}
+    #         password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-        - name: Login to GitHub Container Registry
-          uses: docker/login-action@v2.2.0
-          with:
-            registry: ghcr.io
-            username: ${{ github.repository_owner }}
-            password: ${{ secrets.GITHUB_TOKEN }}
+    #     - name: Login to GitHub Container Registry
+    #       uses: docker/login-action@v2.2.0
+    #       with:
+    #         registry: ghcr.io
+    #         username: ${{ github.repository_owner }}
+    #         password: ${{ secrets.GITHUB_TOKEN }}
 
-        - name: Docker Build For Testing
-          uses: docker/build-push-action@v4
-          with:
-            context: .
-            load: true
-            push: false
-            tags: ${{ env.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha }}
+    #     - name: Docker Build For Testing
+    #       uses: docker/build-push-action@v4
+    #       with:
+    #         context: .
+    #         load: true
+    #         push: false
+    #         tags: ${{ env.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha }}
 
-        - name: Docker Image Test
-          run: |
-            docker images
-            docker run --name solar-system-app -d  \
-                -p 3000:3000 \
-                -e MONGO_URI=$MONGO_URI \
-                -e MONGO_USERNAME=$MONGO_USERNAME \
-                -e MONGO_PASSWORD=$MONGO_PASSWORD \
-                ${{ env.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha }}
+    #     - name: Docker Image Test
+    #       run: |
+    #         docker images
+    #         docker run --name solar-system-app -d  \
+    #             -p 3000:3000 \
+    #             -e MONGO_URI=$MONGO_URI \
+    #             -e MONGO_USERNAME=$MONGO_USERNAME \
+    #             -e MONGO_PASSWORD=$MONGO_PASSWORD \
+    #             ${{ env.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha }}
             
-            export IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' solar-system-app)
-            echo $IP
+    #         export IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' solar-system-app)
+    #         echo $IP
             
-            echo Testing Image URL using wget 
-            wget -q -O - 127.0.0.1:3000/live | grep live	
+    #         echo Testing Image URL using wget 
+    #         wget -q -O - 127.0.0.1:3000/live | grep live	
 
-        - name: Docker Build and Push
-          uses: docker/build-push-action@v4
-          with:
-            context: .
-            push: true
-            tags: |
-                 ${{ env.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha }}
-                 ghcr.io/${{ github.repository_owner }}/solar-system:${{ github.sha }}
+    #     - name: Docker Build and Push
+    #       uses: docker/build-push-action@v4
+    #       with:
+    #         context: .
+    #         push: true
+    #         tags: |
+    #              ${{ env.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha }}
+    #              ghcr.io/${{ github.repository_owner }}/solar-system:${{ github.sha }}
+
     dev-deploy:
       if: contains(github.ref, 'feature/')
       name: Deploy to Dev Environment
-      needs: docker
-      runs-on: ubuntu-latest
-      outputs:
-        APP_INGRESS_URL: ${{ steps.set-ingress-host-address.outputs.APP_INGRESS_HOST }}
-      environment:
-        name: development
-        url: https://${{ steps.set-ingress-host-address.outputs.APP_INGRESS_HOST }}
+      # needs: docker
       steps:
-        - name: Checkout Repository
-          uses: actions/checkout@v4
-  
-        - name: Install Kubectl
-          uses: azure/setup-kubectl@v3
-          with:
-            version: 'v1.26.0' # default is latest stable  
-
-        - name: Set Kube Context
-          uses: azure/k8s-set-context@v3
-          with:
-            method: kubeconfig
-            kubeconfig: ${{ secrets.KUBECONFIG }}
-            #  context: <context name>    
-
-        - name: Fetch Kubernetes Cluster Details
-          run: |
-            kubectl version --short -o yaml
-            echo ---------------------------------------------------
-            kubectl get nodes -o wide
-        
-        - name: Save Nginx Ingress Controller IP as a GITHUB Environment Variable
-          run: |
-            echo "INGRESS_IP=$(kubectl -n ingress-nginx get services ingress-nginx-controller -o jsonpath="{.status.loadBalancer.ingress[0].ip}")" >> $GITHUB_ENV
-
-        - name: Replace ENV values
-          uses: cschleiden/replace-tokens@v1
-          with:
-            tokenPrefix: '_{_'
-            tokenSuffix: '_}_'
-            files: '["kubernetes/development/*.yaml"]'
-          env:
-            NAMESPACE: ${{ vars.NAMESPACE }}
-            REPLICAS: ${{ vars.REPLICAS }}
-            IMAGE: ${{ env.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha }}
-            INGRESS_IP: ${{ env.INGRESS_IP }}
-
-        - name: Check files
-          run: |
-            cat kubernetes/development/*.yaml
-
-        - name: Create MongoDB Secret
-          run: |
-            kubectl -n ${{ vars.NAMESPACE }} create secret generic mongo-db-creds \
-            --from-literal=MONGO_URI=${{ env.MONGO_URI }} \
-            --from-literal=MONGO_USERNAME=${{ env.MONGO_USERNAME }} \
-            --from-literal=MONGO_PASSWORD=${{ secrets.MONGO_PASSWORD }} \
-            --save-config \
-            --dry-run=client \
-            -o yaml | kubectl apply -f -
-
-        - name: Deploy to Kubernetes Development Environment
-          run: |
-            kubectl apply -f kubernetes/development/
-        
-        - name: Set Application HOST Address in GITHUB OUTPUT
-          id: set-ingress-host-address
-          run: |
-            echo "APP_INGRESS_HOST=$(kubectl -n ${{ vars.NAMESPACE }} get ingress -o jsonpath="{.items[0].spec.tls[0].hosts[0]}")" >> "$GITHUB_OUTPUT"
+        - name: Reusable Workflow
+          uses: ./.github/workflows/reuse-deployment.yml
 
     dev-integration-test:
       if: contains(github.ref, 'feature/')
@@ -248,7 +186,7 @@ jobs:
     prod-deploy:
       if: github.ref == 'refs/heads/main'
       name: Deploy to Prod Environment
-      needs: docker
+      # needs: docker
       runs-on: ubuntu-latest
       outputs:
         APP_INGRESS_URL: ${{ steps.set-ingress-host-address.outputs.APP_INGRESS_HOST }}
