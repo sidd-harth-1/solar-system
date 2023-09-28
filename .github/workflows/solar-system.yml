@@ -85,14 +85,8 @@ jobs:
         #   with:
         #     node-version: 18
 
-        - name: Cache NPM dependencies
-          uses: actions/cache@v3
-          with:
-            path: ~/.npm
-            key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}     
-                
-        - name: Install Dependencies
-          run: npm install
+        - name: Custom Composite Action - Install and Cache NPM Packages
+          uses: .github/custom-actions/npm-action
     
         - name: Check Code Coverage
           continue-on-error: true
@@ -151,18 +145,13 @@ jobs:
         - name: Checkout
           uses: actions/checkout@v4
 
-        - name: Dockerhub Login
-          uses: docker/login-action@v2.2.0
+        - name: Custom Composite Action - Docker Login
+          uses: .github/custom-actions/docker-action
           with:
-            username: ${{ env.DOCKERHUB_USERNAME }}
-            password: ${{ secrets.DOCKERHUB_PASSWORD }}
-
-        - name: Login to GitHub Container Registry
-          uses: docker/login-action@v2.2.0
-          with:
-            registry: ghcr.io
-            username: ${{ github.repository_owner }}
-            password: ${{ secrets.GITHUB_TOKEN }}
+            docker-username: ${{ vars.DOCKERHUB_USERNAME }}
+            docker-password: ${{ secrets.DOCKERHUB_PASSWORD }}
+            github-owner: ${{ github.repository_owner }}
+            github-token: ${{ secrets.GITHUB_TOKEN }}
 
         - name: Docker Build For Testing
           uses: docker/build-push-action@v4
