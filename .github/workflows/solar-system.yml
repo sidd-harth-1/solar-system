@@ -252,3 +252,21 @@ jobs:
           run: |
             echo $URL
             curl https://$URL/live -s -k | jq -r .status | grep -i live
+
+    slack-notification:
+      name: Slack Notification
+      needs: [dev-integration-test, prod-integration-test]
+      continue-on-error: true
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v4
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: https://hooks.slack.com/services/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
+          SLACK_CHANNEL: flux-alerts-channel
+          SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
+          SLACK_ICON: https://gitlab.com/sidd-harth/solar-system/-/raw/main/images/saturn.png
+          SLACK_MESSAGE: 'Post Content :rocket:'
+          SLACK_TITLE: Post Title
+          SLACK_USERNAME: ga-bot
