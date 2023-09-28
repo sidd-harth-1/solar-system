@@ -255,7 +255,7 @@ jobs:
 
     slack-notification:
       name: Slack Notification
-      needs: [dev-integration-test, prod-integration-test]
+      needs: [dev-integration-test]
       continue-on-error: true
       runs-on: ubuntu-latest
       steps:
