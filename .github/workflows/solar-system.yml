@@ -14,132 +14,132 @@ env:
     DOCKERHUB_USERNAME: siddharth67
     
 jobs:
-    # unit-testing:
-    #     name: Unit Testing
-    #     runs-on: ${{ matrix.operating_system }}
-    #     env:
-    #         MONGO_URI: 'mongodb://localhost:27017/superData'
-    #         MONGO_USERNAME: non-prod-user
-    #         MONGO_PASSWORD: non-prod-password
-    #     services:
-    #         mongo-db:
-    #           image: siddharth67/mongo-db:non-prod
-    #           ports:
-    #             - 27017:27017
-    #     strategy:
-    #         matrix:
-    #             nodejs_version: [18,  20]
-    #             operating_system: [ubuntu-latest]
-    #             # exclude:
-    #             #     - nodejs_version: [18, 19, 20]
-    #             #       operating_system: [macos-latest]
-    #     steps:
-    #     - name: Checkout Repository
-    #       uses: actions/checkout@v4
+    unit-testing:
+        name: Unit Testing
+        runs-on: ${{ matrix.operating_system }}
+        env:
+            MONGO_URI: 'mongodb://localhost:27017/superData'
+            MONGO_USERNAME: non-prod-user
+            MONGO_PASSWORD: non-prod-password
+        services:
+            mongo-db:
+              image: siddharth67/mongo-db:non-prod
+              ports:
+                - 27017:27017
+        strategy:
+            matrix:
+                nodejs_version: [18,  20]
+                operating_system: [ubuntu-latest]
+                # exclude:
+                #     - nodejs_version: [18, 19, 20]
+                #       operating_system: [macos-latest]
+        steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v4
 
-    #     - name: Setup NodeJS Version - ${{ matrix.nodejs_version }} on ${{ matrix.operating_system }}
-    #       uses: actions/setup-node@v3
-    #       with:
-    #         node-version: ${{ matrix.nodejs_version }}
+        - name: Setup NodeJS Version - ${{ matrix.nodejs_version }} on ${{ matrix.operating_system }}
+          uses: actions/setup-node@v3
+          with:
+            node-version: ${{ matrix.nodejs_version }}
 
-    #     - name: Cache NPM dependencies
-    #       uses: actions/cache@v3
-    #       with:
-    #         path: ~/.npm
-    #         key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}     
+        - name: Cache NPM dependencies
+          uses: actions/cache@v3
+          with:
+            path: ~/.npm
+            key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}     
 
-    #     - name: Install Dependencies
-    #       run: npm install
+        - name: Install Dependencies
+          run: npm install
     
-    #     - name: Unit Testing
-    #       id: node-unit-testing-step
-    #       run: npm test
+        - name: Unit Testing
+          id: node-unit-testing-step
+          run: npm test
           
-    #     - name: Archive Test Result
-    #       if: always() && (steps.node-unit-testing-step.outcome == 'failure' || steps.node-unit-testing-step.outcome == 'success')
-    #       uses: actions/upload-artifact@v3
-    #       with:
-    #         name: Mocha-Test-Result
-    #         path: test-results.xml
+        - name: Archive Test Result
+          if: always() && (steps.node-unit-testing-step.outcome == 'failure' || steps.node-unit-testing-step.outcome == 'success')
+          uses: actions/upload-artifact@v3
+          with:
+            name: Mocha-Test-Result
+            path: test-results.xml
 
-    # code-coverage:
-    #     name: Code Coverage
-    #     env:
-    #         MONGO_URI: 'mongodb://mongo:27017/superData'
-    #         MONGO_USERNAME: non-prod-user
-    #         MONGO_PASSWORD: non-prod-password
-    #     container: 
-    #        image: node:18
-    #     services:
-    #         mongo-db:
-    #             image: siddharth67/mongo-db:non-prod
-    #             options: 
-    #                 --name mongo
-    #     runs-on: ubuntu-latest
-    #     steps:
-    #     - name: Checkout Repository
-    #       uses: actions/checkout@v4
+    code-coverage:
+        name: Code Coverage
+        env:
+            MONGO_URI: 'mongodb://mongo:27017/superData'
+            MONGO_USERNAME: non-prod-user
+            MONGO_PASSWORD: non-prod-password
+        container: 
+           image: node:18
+        services:
+            mongo-db:
+                image: siddharth67/mongo-db:non-prod
+                options: 
+                    --name mongo
+        runs-on: ubuntu-latest
+        steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v4
 
-    #     # - name: Setup NodeJS Version - 18
-    #     #   uses: actions/setup-node@v3
-    #     #   with:
-    #     #     node-version: 18
+        # - name: Setup NodeJS Version - 18
+        #   uses: actions/setup-node@v3
+        #   with:
+        #     node-version: 18
 
-    #     - name: Cache NPM dependencies
-    #       uses: actions/cache@v3
-    #       with:
-    #         path: ~/.npm
-    #         key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}     
+        - name: Cache NPM dependencies
+          uses: actions/cache@v3
+          with:
+            path: ~/.npm
+            key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}     
                 
-    #     - name: Install Dependencies
-    #       run: npm install
+        - name: Install Dependencies
+          run: npm install
     
-    #     - name: Check Code Coverage
-    #       continue-on-error: true
-    #       run: npm run coverage
+        - name: Check Code Coverage
+          continue-on-error: true
+          run: npm run coverage
           
-    #     - name: Archive Test Result
-    #       uses: actions/upload-artifact@v3
-    #       with:
-    #         name: Code-Coverage-Result
-    #         path: coverage
-    #         retention-days: 5
+        - name: Archive Test Result
+          uses: actions/upload-artifact@v3
+          with:
+            name: Code-Coverage-Result
+            path: coverage
+            retention-days: 5
 
-    # reports-s3:
-    #   needs: [code-coverage, unit-testing]
-    #   name: AWS S3 - Upload Reports
-    #   runs-on: ubuntu-latest
-    #   continue-on-error: true
-    #   steps:
-    #     - name: Download Mocha Test Artifact
-    #       uses: actions/download-artifact@v3
-    #       with:
-    #         name: Mocha-Test-Result
+    reports-s3:
+      needs: [code-coverage, unit-testing]
+      name: AWS S3 - Upload Reports
+      runs-on: ubuntu-latest
+      continue-on-error: true
+      steps:
+        - name: Download Mocha Test Artifact
+          uses: actions/download-artifact@v3
+          with:
+            name: Mocha-Test-Result
 
-    #     - name: Download Code Coverage Artifact
-    #       uses: actions/download-artifact@v3
-    #       with:
-    #         name: Code-Coverage-Result
+        - name: Download Code Coverage Artifact
+          uses: actions/download-artifact@v3
+          with:
+            name: Code-Coverage-Result
 
-    #     - name: Merge Test Files
-    #       run: |
-    #         ls -ltr
-    #         mkdir reports-${{ github.sha }}
-    #         mv cobertura-coverage.xml reports-${{ github.sha }}/
-    #         mv test-results.xml reports-${{ github.sha }}/
-    #         ls -ltr reports-${{ github.sha }}/
+        - name: Merge Test Files
+          run: |
+            ls -ltr
+            mkdir reports-${{ github.sha }}
+            mv cobertura-coverage.xml reports-${{ github.sha }}/
+            mv test-results.xml reports-${{ github.sha }}/
+            ls -ltr reports-${{ github.sha }}/
         
-    #     - name: Upload to AWS S3
-    #       uses: jakejarvis/s3-sync-action@master
-    #       with:
-    #         args:  --follow-symlinks --delete
-    #       env:
-    #         AWS_S3_BUCKET: solar-system-reports-bucket-2
-    #         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    #         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    #         AWS_REGION: 'us-east-1'                       
-    #         SOURCE_DIR: 'reports-${{ github.sha }}'
-    #         DEST_DIR: 'reports-${{ github.sha }}'
+        - name: Upload to AWS S3
+          uses: jakejarvis/s3-sync-action@master
+          with:
+            args:  --follow-symlinks --delete
+          env:
+            AWS_S3_BUCKET: solar-system-reports-bucket-2
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_REGION: 'us-east-1'                       
+            SOURCE_DIR: 'reports-${{ github.sha }}'
+            DEST_DIR: 'reports-${{ github.sha }}'
 
     docker:
         name: Containerization
