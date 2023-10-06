@@ -1,4 +1,4 @@
-name: Label Issues (Script Injection Example)
+name: Issues (Script Injection Example)
 on:
   issues:
     types:
@@ -8,8 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Echo Content
-        # env:
-        #   name: ${{ secrets.AZURE_CONNECTION_STRING }}
+        env:
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
           issue_title="${{ github.event.issue.title }}"
           if [[ "$issue_title" == *"bug"* ]]; then
