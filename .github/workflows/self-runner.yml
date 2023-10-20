@@ -4,8 +4,9 @@ on:
 
 jobs:
   assign-label:
-    runs-on: [self-hosted, linux, prod]
+    runs-on: [self-hosted, linux, prod, 1234]
     steps:
       - name: Echo Content
         run: |
           echo Ok
+          slepp 600
