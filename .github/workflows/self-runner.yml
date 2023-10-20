@@ -9,4 +9,4 @@ jobs:
       - name: Echo Content
         run: |
           echo Ok
-          slepp 600
+          sleep 600
