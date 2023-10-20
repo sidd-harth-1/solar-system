@@ -1,0 +1,11 @@
+name: Testing Self-Hosted Runner
+on:
+  workflow_call: 
+
+jobs:
+  assign-label:
+    runs-on: [self-hosted, linux, prod]
+    steps:
+      - name: Echo Content
+        run: |
+          echo Ok
