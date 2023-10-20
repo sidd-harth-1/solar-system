@@ -1,6 +1,6 @@
 name: Testing Self-Hosted Runner
 on:
-  workflow_call: 
+  workflow_dispatch:  
 
 jobs:
   assign-label:
