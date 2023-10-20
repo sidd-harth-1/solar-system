@@ -4,7 +4,7 @@ on:
 
 jobs:
   assign-label:
-    runs-on: [self-hosted, linux, prod, 1234]
+    runs-on: [self-hosted, linux, prod]
     steps:
       - name: Echo Content
         run: |
