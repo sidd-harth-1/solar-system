@@ -10,9 +10,9 @@ jobs:
       - name: Echo Content
         env:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          TITLE: ${{ github.event.issue.title }}
+        #  TITLE: ${{ github.event.issue.title }}
         run: |
-          issue_title="$TITLE"
+          issue_title="${{ github.event.issue.title }}"
           if [[ "$issue_title" == *"bug"* ]]; then
             echo "Issue is about a bug!"
           else
