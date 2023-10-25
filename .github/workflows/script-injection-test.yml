@@ -7,6 +7,7 @@ jobs:
   assign-label:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4.1.1
       - name: Echo Content
         env:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
